@@ -30,6 +30,7 @@ def get_token():
     if res.status_code == 200:
         res = json.loads(res.content)
         return jsonify({"token": res.get('access_token', None)})
+
     else:
         return jsonify({"status_code": res.status_code})
 
