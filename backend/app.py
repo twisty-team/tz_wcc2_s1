@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 USER_PER_PAGE = 10
 
-HOME_PAGE = 'localhost:3000'
+HOME_PAGE = 'http://127.0.0.1:3000/search'
 
 @app.route('/token')
 def get_token():
