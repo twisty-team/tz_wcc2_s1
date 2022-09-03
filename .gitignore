@@ -1,3 +1,4 @@
 sujet.png
 venv
 backend/.env
+.vscode/launch.json
