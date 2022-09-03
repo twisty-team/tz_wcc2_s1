@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, redirect
+from flask_cors import CORS
 import requests
 import json
 from dotenv import load_dotenv
@@ -9,9 +10,16 @@ load_dotenv()
 
 app = Flask(__name__)
 
+CORS(app)
+
 USER_PER_PAGE = 10
 
+# HOME_PAGE = 'http://127.0.0.1:5000'
 HOME_PAGE = 'http://127.0.0.1:3000/search'
+
+@app.route('/')
+def index():
+    return "Hello"
 
 @app.route('/token')
 def get_token():
