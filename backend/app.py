@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect
 import requests
 import json
 from dotenv import load_dotenv
@@ -11,6 +11,7 @@ app = Flask(__name__)
 
 USER_PER_PAGE = 10
 
+HOME_PAGE = 'localhost:3000'
 
 @app.route('/token')
 def get_token():
@@ -29,7 +30,9 @@ def get_token():
     )
     if res.status_code == 200:
         res = json.loads(res.content)
-        return jsonify({"token": res.get('access_token', None)})
+        redirection = redirect(HOME_PAGE)
+        redirection.headers['token'] = res.get('access_token', None)
+        return redirection
     else:
         return jsonify({"status_code": res.status_code})
 
