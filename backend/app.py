@@ -38,9 +38,7 @@ def get_token():
     )
     if res.status_code == 200:
         res = json.loads(res.content)
-        redirection = redirect(HOME_PAGE)
-        redirection.headers['token'] = res.get('access_token', None)
-        return redirection
+        return jsonify({"token": res['access_token']})
     else:
         return jsonify({"status_code": res.status_code})
 
