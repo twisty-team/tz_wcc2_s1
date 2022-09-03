@@ -21,6 +21,16 @@ HOME_PAGE = 'http://127.0.0.1:3000/search'
 def index():
     return "Hello"
 
+@app.after_request
+def after_request(response):
+    response.headers.add(
+        "Access-Control-Allow-Headers", "Content-Type,Authorization,true"
+    )
+    response.headers.add(
+        "Access-Control-Allow-Methods", "GET, OPTIONS"
+    )
+    return response
+
 @app.route('/token')
 def get_token():
     code = request.args.get("code", None)
@@ -55,15 +65,19 @@ def get_users():
     base_url = "https://api.github.com"
 
     auth_header = request.headers.get("Authorization", None)
-    country = request.args.get("country", "france")
+    country = request.args.get("country", "madagascar")
     page = request.args.get("page", 1)
+    username = request.args.get("name", None)
 
     headers = {
         "Accept": "application/vnd.github+json",
         "Authorization": auth_header
     }
     
-    url = f'{base_url}/search/users?q=location:{country}&sort=joined&per_page={USER_PER_PAGE}&page={page}'
+    if username is not None:
+        url = f'{base_url}/search/users?q={username}+in:login+location:{country}&sort=joined&per_page={USER_PER_PAGE}&page={page}'
+    else:
+        url = f'{base_url}/search/users?q=location:{country}&sort=joined&per_page={USER_PER_PAGE}&page={page}'
     
     try:
         res = requests.get(url=url, headers=headers)
@@ -85,6 +99,7 @@ def get_users():
                 "joined_date": None,
                 # "joined_date": get_joined_date(user['url'], headers),
                 "profil_link": user['html_url'],
+                "avatar_url": user['avatar_url'],
             } for user in res['items']
         ]
     }
