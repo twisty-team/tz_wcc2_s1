@@ -38,6 +38,7 @@ def get_token():
     )
     if res.status_code == 200:
         res = json.loads(res.content)
+        print(res)
         return jsonify({"token": res['access_token']})
     else:
         return jsonify({"status_code": res.status_code})
