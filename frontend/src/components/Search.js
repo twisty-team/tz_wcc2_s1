@@ -1,21 +1,34 @@
 import React, { useState, useEffect } from "react";
 import Pays from "./Pays";
 import User from "./User";
+import Pagination from 'react-bootstrap-4-pagination';
 
 
 const Search = () => {
-
+    const items_per_page = 10;
+    const [isSearch, setIsSearch] = useState(false);
     const [pays, setPays] = useState([]);
     const [users, setUsers] = useState([]);
+    const [totalPage, setTotalPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [paginationConfig, setPaginationConfig] = useState({});
+    const [totalCount, setTotalCount] = useState(0);  
+
+
     useEffect(() => {
         getPays();
+        if (isSearch === false) {
+            document.getElementById('username').disabled = true;
+            document.getElementById('btn-search').disabled = true;
+        }
+        //document.getElementById('pagination').hidden = false;
+        if (totalPage < 1) {
+            //document.getElementById('pagination').hidden = true;
+        }
+
     }, []);
 
-    const SessionDataStorage = (e) => {
-        e.preventDefault();
-        sessionStorage.setItem("name", 'test');
-        //console.log(name);
-    };
+    
 
 
     const getPays = async () => {
@@ -23,60 +36,188 @@ const Search = () => {
             'https://data.gouv.nc/api/records/1.0/search/?dataset=liste-des-pays-et-territoires-etrangers&q=&rows=10000&facet=cog'
         );
         const response = await requete.json();
-        setPays(response.records);
+        const array_pays = response.records;
+        var array_sortned = []
+        array_pays.map(obj => (
+            array_sortned.push({ recordid: obj.recordid, libcog: obj.fields.libcog.toLowerCase() })
+        ));
+
+        setPays(array_sortned.sort(function (a, b) {
+            return a.libcog.localeCompare(b.libcog);
+        }));
     }
 
-    const getUsers = async () => {
+    const getUsers = async (current_page) => {
+        document.getElementById('username').disabled = false;
+        document.getElementById('btn-search').disabled = false;
+        document.getElementById('loading').classList = "d-flex justify-content-center";
+        setIsSearch(true);
+        setCurrentPage(current_page);
         var location = document.getElementById('location').value;
         var username = document.getElementById('username').value;
         var query = '';
-        if(location !== undefined){
-            query = 'https://api.github.com/search/users?q=location:'+location+'&sort=joined'
-            if(username !== undefined){
-                query = 'https://api.github.com/search/users?q='+username+'+in:name+location:'+location+'&sort=joined'
+        if(window.sessionStorage.getItem("token")){
+            if(location !== undefined){
+                query = 'http://localhost:5000/users?name='+encodeURI(username)+'&page='+currentPage;
+                if(username !== undefined){
+                    query = 'http://localhost:5000/users?name='+encodeURI(username)+'&country='+encodeURI(location)+'&page='+currentPage;
+                }    
             }
-        } 
+        }else{
+            if (location !== undefined) {
+                query = 'https://api.github.com/search/users?q=' + encodeURI('location:' + location + '&sort=joined&per_page=' + items_per_page + '&page=' + currentPage);
+                if (username !== undefined) {
+                    query = 'https://api.github.com/search/users?q=' + username + '+in:login+location:' + location + '&sort=joined&per_page=' + items_per_page + '&page=' + currentPage;
+                }
+            }
+        }
         const req = await fetch(
-            //query
-            'http://localhost:5000/users'
+            query
         )
-        const response = req.json();
-        setUsers(response);
-        console.log(response);
-        response.items.map(rep=>(
-            console.log(rep)
-        ))
+        const response = await req.json();
+        if(window.sessionStorage.getItem('token')){
+            console.log(response);
+            setUsers(response.users);
+            const number_of_page = calculate_total_page(response.total_count, items_per_page);
+            setTotalCount(response.total_count);
+            setTotalPage(number_of_page);
+            setPaginationConfig({
+                totalPages: number_of_page,
+                currentPage: currentPage,
+                showMax: 5,
+                size: "sm",
+                threeDots: true,
+                prevNext: true,
+                onClick: function (page) {
+                    setCurrentPage(page);
+                    console.log(currentPage);
+                }
+            });
+        }
+        else{
+            setUsers(response.items);
+            console.log(response.items);
+            const number_of_page = calculate_total_page(response.total_count, items_per_page);
+            setTotalCount(response.total_count);
+            setTotalPage(number_of_page);
+            setPaginationConfig({
+                totalPages: number_of_page,
+                currentPage: currentPage,
+                showMax: 5,
+                size: "sm",
+                threeDots: true,
+                prevNext: true,
+                onClick: function (page) {
+                    setCurrentPage(page);
+                    console.log(currentPage);
+                }
+            });
+        }
+        document.getElementById('loading').classList = "d-flex justify-content-center d-none";
     }
+
+    const calculate_total_page = (total_items, items_per_page) => {
+        var total;
+        if (total_items % items_per_page === 0) {
+            total = total_items / items_per_page;
+        } else {
+            total = Math.floor(total_items / items_per_page) + 1;
+        }
+        return total;
+    }
+
+    const Users = ({ isSearch, users, total_count }) => {
+        if (isSearch === true) {
+            if (users.length > 0) {
+                return (
+                    <div className="row">
+                        <h4 className="text-center" aria-current="page">{total_count} users found</h4>
+                        <div className="list-group">
+                            {users && users.map(user => (
+                                <User
+                                    key={window.sessionStorage.getItem('token') ? user.username : user.login}
+                                    username={window.sessionStorage.getItem('token') ? user.username : user.login}
+                                    user_url={user.html_url}
+                                    avatar_url={user.avatar_url}
+                                    pays={document.getElementById('location').value}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )
+            }
+            return (
+                <h3 className="text-center">No users found</h3>
+            )
+        } else {
+            return (
+                <div className="row">
+                    <h3 className="text-center">Please select country</h3>
+                </div>
+            )
+        }
+    }
+
+    const handleChange = () => {
+        getUsers(currentPage);
+    }
+
+    const handleClick = () => {
+        getUsers(currentPage);
+    }
+
+    const Paginator = ({ total_page }) => {
+        if (total_page > 1) {
+            return (
+                <Pagination {...paginationConfig} />
+            )
+        }
+        return ('')
+    }
+
 
     return (
         <div className="container mt-5">
             <div className="row">
-                <div className="col-md-8 mx-auto">
+                <p className="text-muted">status: {window.sessionStorage.getItem('token') ? "Authenticated":"Not Authenticated" }</p>
+                <div className="col-md-6 mx-auto">
                     <div className="row">
                         <div className="col-md-4">
-                            <select name="" id="location" className="form-control" onChange={getUsers}>
-                                <option>Pays</option>
-                                { pays.map(p => (
-                                    <Pays 
-                                        key={p.fields.libcog}
-                                        name={p.fields.libcog.toLowerCase()}
+                            <select name="" id="location" className="form-control" onChange={handleChange}>
+                                <option>Country</option>
+                                {pays.map(p => (
+                                    <Pays
+                                        key={p.recordid}
+                                        name={p.libcog}
                                     />
                                 ))}
                             </select>
                         </div>
                         <div className="col-md-8">
-                            <input type="text" name="" id="username" className="form-control" onChange={getUsers} placeholder="username" />
+                            <div className="input-group mb-3">
+                                <input type="text" name="" id="username" className="form-control" placeholder="Search by username" />
+                                <button className="btn btn-secondary" onClick={handleClick} id="btn-search">Search</button>
+                            </div>
                         </div>
                     </div>
                     <div className="row">
-                        <div className="list-group">
-                            {/*users.map(user => (
-                                <User 
-                                    key={user}
-                                    pays={"test"}
-                                    username={"test"}
-                                />
-                            ))*/}
+                        <div className="d-flex justify-content-center d-none" id="loading">
+                            <div className="spinner-border text-danger" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        {
+                            users &&
+                            <Users
+                                isSearch={isSearch}
+                                users={users}
+                                total_count = {totalCount}
+                            />
+                        }
+                    </div>
+                    <div className="row" id="pagination">
+                        <div className="d-flex justify-content-center mt-3">
+                            <Paginator total_page={totalPage} />
                         </div>
                     </div>
                 </div>

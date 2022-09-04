@@ -4,7 +4,7 @@ import './App.css';
 import Accueil from './components/Accueil';
 import Search from './components/Search';
 import Default from './components/Default';
-
+import Token from './components/Token';
 
 function App() {
   return (
@@ -12,6 +12,7 @@ function App() {
       <div className="text-white">
         <Routes>
           <Route exact path='/' element={<Accueil/>}/>
+          <Route path='/token' element={<Token/>}/>
           <Route path='/search' element={<Search/>}/>
           <Route element={<Default/>}/>
         </Routes>
