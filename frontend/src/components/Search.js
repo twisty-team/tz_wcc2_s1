@@ -56,34 +56,63 @@ const Search = () => {
         var location = document.getElementById('location').value;
         var username = document.getElementById('username').value;
         var query = '';
-        if (location !== undefined) {
-            query = 'https://api.github.com/search/users?q=' + encodeURI('location:' + location + '&sort=joined&per_page=' + items_per_page + '&page=' + currentPage);
-            if (username !== undefined) {
-                query = 'https://api.github.com/search/users?q=' + username + '+in:login+location:' + location + '&sort=joined&per_page=' + items_per_page + '&page=' + currentPage;
+        if(window.sessionStorage.getItem("token")){
+            if(location !== undefined){
+                query = 'http://localhost:5000/users?name='+encodeURI(username)+'&page='+currentPage;
+                if(username !== undefined){
+                    query = 'http://localhost:5000/users?name='+encodeURI(username)+'&country='+encodeURI(location)+'&page='+currentPage;
+                }    
+            }
+        }else{
+            if (location !== undefined) {
+                query = 'https://api.github.com/search/users?q=' + encodeURI('location:' + location + '&sort=joined&per_page=' + items_per_page + '&page=' + currentPage);
+                if (username !== undefined) {
+                    query = 'https://api.github.com/search/users?q=' + username + '+in:login+location:' + location + '&sort=joined&per_page=' + items_per_page + '&page=' + currentPage;
+                }
             }
         }
         const req = await fetch(
             query
-            //'http://localhost:5000/users'
         )
         const response = await req.json();
-        setUsers(response.items);
-        console.log(response.items);
-        const number_of_page = calculate_total_page(response.total_count, items_per_page);
-        setTotalCount(response.total_count);
-        setTotalPage(number_of_page);
-        setPaginationConfig({
-            totalPages: number_of_page,
-            currentPage: currentPage,
-            showMax: 5,
-            size: "sm",
-            threeDots: true,
-            prevNext: true,
-            onClick: function (page) {
-                setCurrentPage(page);
-                console.log(currentPage);
-            }
-        });
+        if(window.sessionStorage.getItem('token')){
+            console.log(response);
+            setUsers(response.users);
+            const number_of_page = calculate_total_page(response.total_count, items_per_page);
+            setTotalCount(response.total_count);
+            setTotalPage(number_of_page);
+            setPaginationConfig({
+                totalPages: number_of_page,
+                currentPage: currentPage,
+                showMax: 5,
+                size: "sm",
+                threeDots: true,
+                prevNext: true,
+                onClick: function (page) {
+                    setCurrentPage(page);
+                    console.log(currentPage);
+                }
+            });
+        }
+        else{
+            setUsers(response.items);
+            console.log(response.items);
+            const number_of_page = calculate_total_page(response.total_count, items_per_page);
+            setTotalCount(response.total_count);
+            setTotalPage(number_of_page);
+            setPaginationConfig({
+                totalPages: number_of_page,
+                currentPage: currentPage,
+                showMax: 5,
+                size: "sm",
+                threeDots: true,
+                prevNext: true,
+                onClick: function (page) {
+                    setCurrentPage(page);
+                    console.log(currentPage);
+                }
+            });
+        }
         document.getElementById('loading').classList = "d-flex justify-content-center d-none";
     }
 
@@ -98,8 +127,6 @@ const Search = () => {
     }
 
     const Users = ({ isSearch, users, total_count }) => {
-        //console.log(isSearch);
-        //console.log(users);
         if (isSearch === true) {
             if (users.length > 0) {
                 return (
@@ -108,8 +135,8 @@ const Search = () => {
                         <div className="list-group">
                             {users && users.map(user => (
                                 <User
-                                    key={user.login}
-                                    username={user.login}
+                                    key={window.sessionStorage.getItem('token') ? user.username : user.login}
+                                    username={window.sessionStorage.getItem('token') ? user.username : user.login}
                                     user_url={user.html_url}
                                     avatar_url={user.avatar_url}
                                     pays={document.getElementById('location').value}
@@ -152,6 +179,7 @@ const Search = () => {
     return (
         <div className="container mt-5">
             <div className="row">
+                <p className="text-muted">status: {window.sessionStorage.getItem('token') ? "Authenticated":"Not Authenticated" }</p>
                 <div className="col-md-6 mx-auto">
                     <div className="row">
                         <div className="col-md-4">
