@@ -87,8 +87,7 @@ const Search = () => {
                 onClick: function (page) {
                     setCurrentPage(page);
                     getUsers(page);
-                },
-                center: true
+                }
             });
         }
         else {
@@ -109,8 +108,7 @@ const Search = () => {
                 onClick: function (page) {
                     setCurrentPage(page);
                     getUsers(page);
-                },
-                center: true
+                }
             });
         }
         document.getElementById('loading').classList = "d-flex justify-content-center d-none";
@@ -160,11 +158,11 @@ const Search = () => {
     }
 
     const handleChange = () => {
-        getUsers(currentPage);
+        getUsers(1);
     }
 
     const handleClick = () => {
-        getUsers(currentPage);
+        getUsers(1);
     }
 
     const Paginator = ({ total_page }) => {
