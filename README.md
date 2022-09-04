@@ -36,4 +36,4 @@ A new tab will be open with your default browser where you can use the app.
 # Authors
 * [tbgracy](https://github.com/tbgracy)
 
-* [rhja](https://github.com/orgs/radoheritiana)
+* [rhja](https://github.com/radoheritiana)

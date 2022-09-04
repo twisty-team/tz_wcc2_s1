@@ -12,7 +12,7 @@ const Search = () => {
     const [totalPage, setTotalPage] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [paginationConfig, setPaginationConfig] = useState({});
-    const [totalCount, setTotalCount] = useState(0);  
+    const [totalCount, setTotalCount] = useState(0);
 
 
     useEffect(() => {
@@ -21,14 +21,9 @@ const Search = () => {
             document.getElementById('username').disabled = true;
             document.getElementById('btn-search').disabled = true;
         }
-        //document.getElementById('pagination').hidden = false;
-        if (totalPage < 1) {
-            //document.getElementById('pagination').hidden = true;
-        }
-
     }, []);
 
-    
+
 
 
     const getPays = async () => {
@@ -52,22 +47,21 @@ const Search = () => {
         document.getElementById('btn-search').disabled = false;
         document.getElementById('loading').classList = "d-flex justify-content-center";
         setIsSearch(true);
-        setCurrentPage(current_page);
         var location = document.getElementById('location').value;
         var username = document.getElementById('username').value;
         var query = '';
-        if(window.sessionStorage.getItem("token")){
-            if(location !== undefined){
-                query = 'http://localhost:5000/users?name='+encodeURI(username)+'&page='+currentPage;
-                if(username !== undefined){
-                    query = 'http://localhost:5000/users?name='+encodeURI(username)+'&country='+encodeURI(location)+'&page='+currentPage;
-                }    
-            }
-        }else{
+        if (window.sessionStorage.getItem("token")) {
             if (location !== undefined) {
-                query = 'https://api.github.com/search/users?q=' + encodeURI('location:' + location + '&sort=joined&per_page=' + items_per_page + '&page=' + currentPage);
+                query = 'http://localhost:5000/users?name=' + encodeURI(username) + '&page=' + current_page;
                 if (username !== undefined) {
-                    query = 'https://api.github.com/search/users?q=' + username + '+in:login+location:' + location + '&sort=joined&per_page=' + items_per_page + '&page=' + currentPage;
+                    query = 'http://localhost:5000/users?name=' + encodeURI(username) + '&country=' + encodeURI(location) + '&page=' + current_page;
+                }
+            }
+        } else {
+            if (location !== undefined) {
+                query = 'https://api.github.com/search/users?q=' + encodeURI('location:' + location + '&sort=joined&per_page=' + items_per_page + '&page=' + current_page);
+                if (username !== undefined) {
+                    query = 'https://api.github.com/search/users?q=' + username + '+in:login+location:' + location + '&sort=joined&per_page=' + items_per_page + '&page=' + current_page;
                 }
             }
         }
@@ -75,41 +69,45 @@ const Search = () => {
             query
         )
         const response = await req.json();
-        if(window.sessionStorage.getItem('token')){
-            console.log(response);
+        if (window.sessionStorage.getItem('token')) {
             setUsers(response.users);
-            const number_of_page = calculate_total_page(response.total_count, items_per_page);
+            var number_of_page = calculate_total_page(response.total_count, items_per_page);
             setTotalCount(response.total_count);
+            if(number_of_page > 100){
+                number_of_page = 100;
+            }
             setTotalPage(number_of_page);
             setPaginationConfig({
                 totalPages: number_of_page,
-                currentPage: currentPage,
-                showMax: 5,
+                currentPage: current_page,
+                showMax: 2,
                 size: "sm",
                 threeDots: true,
                 prevNext: true,
                 onClick: function (page) {
                     setCurrentPage(page);
-                    console.log(currentPage);
+                    getUsers(page);
                 }
             });
         }
-        else{
+        else {
             setUsers(response.items);
-            console.log(response.items);
-            const number_of_page = calculate_total_page(response.total_count, items_per_page);
+            var  number_of_page = calculate_total_page(response.total_count, items_per_page);
             setTotalCount(response.total_count);
+            if(number_of_page > 100){
+                number_of_page = 100;
+            }
             setTotalPage(number_of_page);
             setPaginationConfig({
                 totalPages: number_of_page,
-                currentPage: currentPage,
-                showMax: 5,
+                currentPage: current_page,
+                showMax: 2,
                 size: "sm",
                 threeDots: true,
                 prevNext: true,
                 onClick: function (page) {
                     setCurrentPage(page);
-                    console.log(currentPage);
+                    getUsers(page);
                 }
             });
         }
@@ -132,6 +130,7 @@ const Search = () => {
                 return (
                     <div className="row">
                         <h4 className="text-center" aria-current="page">{total_count} users found</h4>
+                        <p>{(total_count > 1000) ? "Only the 100 first pages are availables." : "" }</p>
                         <div className="list-group">
                             {users && users.map(user => (
                                 <User
@@ -159,11 +158,11 @@ const Search = () => {
     }
 
     const handleChange = () => {
-        getUsers(currentPage);
+        getUsers(1);
     }
 
     const handleClick = () => {
-        getUsers(currentPage);
+        getUsers(1);
     }
 
     const Paginator = ({ total_page }) => {
@@ -179,7 +178,7 @@ const Search = () => {
     return (
         <div className="container mt-5">
             <div className="row">
-                <p className="text-muted">status: {window.sessionStorage.getItem('token') ? "Authenticated":"Not Authenticated" }</p>
+                <p className="text-muted">status: {window.sessionStorage.getItem('token') ? "Authenticated" : "Not Authenticated"}</p>
                 <div className="col-md-6 mx-auto">
                     <div className="row">
                         <div className="col-md-4">
@@ -211,7 +210,7 @@ const Search = () => {
                             <Users
                                 isSearch={isSearch}
                                 users={users}
-                                total_count = {totalCount}
+                                total_count={totalCount}
                             />
                         }
                     </div>
