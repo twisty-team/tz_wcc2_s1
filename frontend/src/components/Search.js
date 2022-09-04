@@ -21,6 +21,9 @@ const Search = () => {
             document.getElementById('username').disabled = true;
             document.getElementById('btn-search').disabled = true;
         }
+        setTimeout(() => {
+            document.getElementById('loader').classList = "loader-container d-none";
+        }, 2000)
     }, []);
 
 
@@ -73,7 +76,7 @@ const Search = () => {
             setUsers(response.users);
             var number_of_page = calculate_total_page(response.total_count, items_per_page);
             setTotalCount(response.total_count);
-            if(number_of_page > 100){
+            if (number_of_page > 100) {
                 number_of_page = 100;
             }
             setTotalPage(number_of_page);
@@ -92,9 +95,9 @@ const Search = () => {
         }
         else {
             setUsers(response.items);
-            var  number_of_page = calculate_total_page(response.total_count, items_per_page);
+            var number_of_page = calculate_total_page(response.total_count, items_per_page);
             setTotalCount(response.total_count);
-            if(number_of_page > 100){
+            if (number_of_page > 100) {
                 number_of_page = 100;
             }
             setTotalPage(number_of_page);
@@ -130,7 +133,7 @@ const Search = () => {
                 return (
                     <div className="row">
                         <h4 className="text-center" aria-current="page">{total_count} users found</h4>
-                        <p>{(total_count > 1000) ? "Only the 100 first pages are availables." : "" }</p>
+                        <p>{(total_count > 1000) ? "Only the 100 first pages are availables." : ""}</p>
                         <div className="list-group">
                             {users && users.map(user => (
                                 <User
@@ -176,47 +179,54 @@ const Search = () => {
 
 
     return (
-        <div className="container mt-5">
-            <div className="row">
-                <p className="text-muted">status: {window.sessionStorage.getItem('token') ? "Authenticated" : "Not Authenticated"}</p>
-                <div className="col-md-6 mx-auto">
-                    <div className="row">
-                        <div className="col-md-4">
-                            <select name="" id="location" className="form-control" onChange={handleChange}>
-                                <option>Country</option>
-                                {pays.map(p => (
-                                    <Pays
-                                        key={p.recordid}
-                                        name={p.libcog}
+        <div>
+            <div className="loader-container" id="loader">
+                <div className="spinner"></div>
+            </div>
+            <div className="container">
+                <div className="row mt-5">
+                    <p className="text-muted">status: {window.sessionStorage.getItem('token') ? "Authenticated" : "Not Authenticated"}</p>
+                    <div className="col-md-6 mx-auto">
+                        <div className="row">
+                            <div className="col-md-4">
+                                <select name="" id="location" className="form-select" onChange={handleChange}>
+                                    <option>Country</option>
+                                    {pays.map(p => (
+                                        <Pays
+                                            key={p.recordid}
+                                            name={p.libcog}
+                                        />
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="col-md-8">
+                                <div className="input-group mb-3">
+                                    <input type="text" name="" id="username" className="form-control" placeholder="Search by username" />
+                                    <button className="btn btn-secondary" onClick={handleClick} id="btn-search">Search</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="d-flex justify-content-center d-none" id="loading">
+                                    <div className="spinner-border text-danger" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                                {
+                                    users &&
+                                    <Users
+                                        isSearch={isSearch}
+                                        users={users}
+                                        total_count={totalCount}
                                     />
-                                ))}
-                            </select>
-                        </div>
-                        <div className="col-md-8">
-                            <div className="input-group mb-3">
-                                <input type="text" name="" id="username" className="form-control" placeholder="Search by username" />
-                                <button className="btn btn-secondary" onClick={handleClick} id="btn-search">Search</button>
+                                }
+                                <div className="row" id="pagination">
+                                    <div className="d-flex justify-content-center mt-3">
+                                        <Paginator total_page={totalPage} />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="d-flex justify-content-center d-none" id="loading">
-                            <div className="spinner-border text-danger" role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
-                        </div>
-                        {
-                            users &&
-                            <Users
-                                isSearch={isSearch}
-                                users={users}
-                                total_count={totalCount}
-                            />
-                        }
-                    </div>
-                    <div className="row" id="pagination">
-                        <div className="d-flex justify-content-center mt-3">
-                            <Paginator total_page={totalPage} />
                         </div>
                     </div>
                 </div>
