@@ -1,15 +1,5 @@
 
 const Token = () => {
-    
-    window.onload = () => {
-        const params = new Proxy(new URLSearchParams(window.location.search), {
-            get: (searchParams, prop) => searchParams.get(prop),
-        });
-
-        let value = params.code;
-        getToken(value);
-    }
-
     const getToken = async (value) => {
         const requete = await fetch(
             'http://localhost:5000/token?code='+value
@@ -18,6 +8,25 @@ const Token = () => {
         window.sessionStorage.setItem('token', response.token);
         window.location.href = "/search";
     }
+    if (document.readyState === "complete") {
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        });
+
+        let value = params.code;
+        getToken(value);
+    } else {
+        window.onload = () => {
+            const params = new Proxy(new URLSearchParams(window.location.search), {
+                get: (searchParams, prop) => searchParams.get(prop),
+            });
+
+            let value = params.code;
+            getToken(value);
+        }
+    }
+
+
 }
 
 export default Token;
