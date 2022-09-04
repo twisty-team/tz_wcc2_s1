@@ -3,7 +3,6 @@ This app allow github users to get a list of github users by country and search 
 user by its username.
 
 ## Getting Started
-![]()
 You have the choice between using the app with authentication or not.
 When authenticated, you are allowed to make up to 30 requests per minutes against 10 when you're not authenticated.
 The authentication is done your your github account.
@@ -12,7 +11,7 @@ The authentication is done your your github account.
 ##  Prerequisites
 You need to have python 3 installed on your machine in order to run the backend and npm for the frontend.
 ### Backend
-- Install the necessary python packages :
+- Install the necessary python packages (preferably in a virtual environment):
 ```sh
 cd backend/
 pip3 install -r requirements.txt
