@@ -20,7 +20,7 @@ pip3 install -r requirements.txt
 ### Frontend
 - Install the necessary node modules :
 ```sh
-cd ../frontend/
+cd frontend/
 npm install # or npm i
 ```
 ## How to run

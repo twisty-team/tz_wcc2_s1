@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Pays from "./Pays";
-import User from "./User";
-import Pagination from 'react-bootstrap-4-pagination';
+import Users from "./Users";
+import Paginator from "./Paginator";
 
 
 const Search = () => {
@@ -14,7 +14,6 @@ const Search = () => {
     const [paginationConfig, setPaginationConfig] = useState({});
     const [totalCount, setTotalCount] = useState(0);
 
-
     useEffect(() => {
         getPays();
         if (isSearch === false) {
@@ -25,9 +24,6 @@ const Search = () => {
             document.getElementById('loader').classList = "loader-container d-none";
         }, 2000)
     }, []);
-
-
-
 
     const getPays = async () => {
         const requete = await fetch(
@@ -127,39 +123,6 @@ const Search = () => {
         return total;
     }
 
-    const Users = ({ isSearch, users, total_count }) => {
-        if (isSearch === true) {
-            if (users.length > 0) {
-                return (
-                    <div className="row">
-                        <h4 className="text-center" aria-current="page">{total_count} users found</h4>
-                        <p>{(total_count > 1000) ? "Only the 100 first pages are availables." : ""}</p>
-                        <div className="list-group">
-                            {users && users.map(user => (
-                                <User
-                                    key={window.sessionStorage.getItem('token') ? user.username : user.login}
-                                    username={window.sessionStorage.getItem('token') ? user.username : user.login}
-                                    user_url={user.html_url}
-                                    avatar_url={user.avatar_url}
-                                    pays={document.getElementById('location').value}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )
-            }
-            return (
-                <h3 className="text-center">No users found</h3>
-            )
-        } else {
-            return (
-                <div className="row">
-                    <h3 className="text-center">Please select country</h3>
-                </div>
-            )
-        }
-    }
-
     const handleChange = () => {
         getUsers(1);
     }
@@ -167,16 +130,6 @@ const Search = () => {
     const handleClick = () => {
         getUsers(1);
     }
-
-    const Paginator = ({ total_page }) => {
-        if (total_page > 1) {
-            return (
-                <Pagination {...paginationConfig} />
-            )
-        }
-        return ('')
-    }
-
 
     return (
         <div>
@@ -223,7 +176,9 @@ const Search = () => {
                                 }
                                 <div className="row" id="pagination">
                                     <div className="d-flex justify-content-center mt-3">
-                                        <Paginator total_page={totalPage} />
+                                        <Paginator 
+                                        total_page={totalPage}
+                                        paginationConfig={paginationConfig} />
                                     </div>
                                 </div>
                             </div>
@@ -233,7 +188,6 @@ const Search = () => {
             </div>
         </div>
     );
-
 }
 
 export default Search;
