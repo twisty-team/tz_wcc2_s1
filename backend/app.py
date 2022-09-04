@@ -66,8 +66,8 @@ def get_users():
     base_url = "https://api.github.com"
 
     auth_header = request.headers.get("Authorization", None)
-    country = request.args.get("country", "madagascar")
-    page = request.args.get("page", 1)
+    country = request.args.get("country", None)
+    page = request.args.get("page", None)
     username = request.args.get("name", None)
 
     headers = {
