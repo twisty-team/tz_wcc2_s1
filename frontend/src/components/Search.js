@@ -80,7 +80,7 @@ const Search = () => {
             setPaginationConfig({
                 totalPages: number_of_page,
                 currentPage: current_page,
-                showMax: 5,
+                showMax: 2,
                 size: "sm",
                 threeDots: true,
                 prevNext: true,
@@ -101,7 +101,7 @@ const Search = () => {
             setPaginationConfig({
                 totalPages: number_of_page,
                 currentPage: current_page,
-                showMax: 5,
+                showMax: 2,
                 size: "sm",
                 threeDots: true,
                 prevNext: true,

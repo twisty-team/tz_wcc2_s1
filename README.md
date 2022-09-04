@@ -10,4 +10,4 @@ user by its username.
 # Authors
 * [tbgracy](https://github.com/tbgracy)
 
-* [rhja](https://github.com/orgs/radoheritiana)
+* [rhja](https://github.com/radoheritiana)
