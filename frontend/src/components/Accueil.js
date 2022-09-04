@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 
 export default class Accueil extends Component {
 
@@ -7,16 +8,24 @@ export default class Accueil extends Component {
 
         return (
             <div className="container mt-2">
-                <p>
-                    Well, hello there!
-                </p>
-                <p>
-                    We're going to now talk to the GitHub API. Ready?
-                    <a href="https://github.com/login/oauth/authorize?client_id=Iv1.3557116d6bcf2043">Click here</a> to begin!
-                </p>
-                <p>
-                    If that link doesn't work, remember to provide your own <a href="/apps/building-oauth-apps/authorizing-oauth-apps/">Client ID</a>!
-                </p>
+                <h3 className="text-center">Github users Search</h3>
+                <div className="col-md-10 mx-auto mt-5">
+                    <div className="row">
+                        <div className="col text-center">
+                            <h4>If you have an github acount</h4>
+                            <a className="btn btn-warning mt-3 mb-3" 
+                            href="https://github.com/login/oauth/authorize?client_id=Iv1.3557116d6bcf2043">
+                                Click here
+                            </a>
+                            <p><b>Advantage: </b>limit of request per minutes 30</p>
+                        </div>
+                        <div className="col text-center">
+                            <h4>Else</h4>
+                            <Link to="/search" className="btn btn-warning mt-3 mb-3">Click here</Link>
+                            <p><b>NB: </b>Limit of request per minutes 10</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

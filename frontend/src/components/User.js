@@ -3,9 +3,9 @@ import React from "react";
 
 const User = ({ pays, username, user_url, avatar_url }) => {
     return (
-        <li className="list-group-item d-flex justify-content-between align-items-start">
+        <li className="list-group-item d-flex justify-content-between align-items-start mt-1 rounded-3">
             <img src={avatar_url} alt="user avatar" className="avatar" />
-            <div className="ms-2 me-auto">
+            <div className="ms-3 me-auto">
                 <div className="fw-bold">{username}</div>
                 {pays}
             </div>

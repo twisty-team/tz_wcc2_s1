@@ -13,19 +13,24 @@ const Token = () => {
         getToken(value);
     },[])
 
+    const SessionDataStorage = (e, token) => {
+        e.preventDefault();
+        sessionStorage.setItem("token", token);
+        //console.log(name);
+    };
+
     const getToken = async (value) => {
         const requete = await fetch(
             'http://localhost:5000/token?code='+value
         )
         const response = await requete.json();
-
-        console.log(response);
+        
+        sessionStorage(response.token);
+        console.log(response.token);
+        
+        window.location.href = "/search";
 
     }
-
-    return (
-        <div className="row"></div>
-    )
 }
 
 export default Token;
